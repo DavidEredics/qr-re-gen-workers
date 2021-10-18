@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "qr-re-gen-workers",
+  "version": "1.0.0",
+  "description": "QR code generator and reader API with Cloudflare Workers",
+  "main": "./src/index.js",
+  "scripts": {
+    "dev": "miniflare --host 127.0.0.1 --watch --debug",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dávid Eredics",
+  "license": "MIT",
+  "dependencies": {
+    "itty-router": "^2.4.4",
+    "jsqr": "^1.4.0",
+    "pngjs": "^6.0.0",
+    "qr-image": "^3.2.0"
+  },
+  "devDependencies": {
+    "miniflare": "^1.4.1"
+  }
+}
