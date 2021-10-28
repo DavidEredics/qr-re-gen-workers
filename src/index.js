@@ -78,10 +78,14 @@ router.post('/', async request => {
       const requestJson = await request.json();
       if (Object.prototype.hasOwnProperty.call(requestJson, 'text')) {
         if (Object.prototype.hasOwnProperty.call(requestJson, 'format')) {
-          return QRgen(requestJson.text, requestJson.format);
+          const response = await QRgen(requestJson.text, requestJson.format);
+          response.headers.append('Access-Control-Allow-Origin', '*');
+          return response;
         }
         // return svg by default
-        return QRgen(requestJson.text, 'svg');
+        const response = await QRgen(requestJson.text, 'svg');
+        response.headers.append('Access-Control-Allow-Origin', '*');
+        return response;
       }
       return new Response(JSON.stringify({ 'Error':'Please provide text for the QR code' }), {
         status: 400, headers: { 'Content-Type': 'application/json' }
@@ -100,9 +104,11 @@ router.post('/', async request => {
 
 router.put('/*', async request => {
   return request.arrayBuffer()
-    .then(buff => {
+    .then(async buff => {
       if (buff.byteLength > 0) {
-        return QRread(buff);
+        const response = await QRread(buff);
+        response.headers.append('Access-Control-Allow-Origin', '*');
+        return response;
       }
       return new Response(JSON.stringify({ 'Error': 'empty/no file' }), {
         status: 400, headers: { 'Content-Type': 'application/json' }
@@ -112,6 +118,13 @@ router.put('/*', async request => {
 
 // 404 for everything else
 router.all('*', (request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: { 'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS' }
+    });
+  }
   if (request.method !== 'GET' || request.method !== 'POST' || request.method !== 'PUT') {
     return new Response('Only GET and POST method allowed for generating and PUT method for reading', {
       status: 405, headers: { Allow: 'GET, POST, PUT' }
